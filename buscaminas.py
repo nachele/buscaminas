@@ -13,6 +13,9 @@ anchoCelda = 50
 altoCelda = 50
 imagen = pygame.image.load("imgBusca/1.png")
 imagenTrans = pygame.transform.scale(imagen,(50,50))
+mousePos = pygame.mouse.get_pos()
+teclaMouse = pygame.mouse.get_pressed()
+bombita = 0
 
 class Casilla:
     def __init__(self,x,y,imagen):
@@ -41,7 +44,7 @@ def crearBombas():
 
 
 def casillaBomba():
-    global campo, anchoCelda, altoCelda
+    global campo, anchoCelda, altoCelda, mousePos, teclaMouse
     mousePos = pygame.mouse.get_pos()
     teclaMouse = pygame.mouse.get_pressed()
     x = int((mousePos[0])/ anchoCelda)
@@ -51,6 +54,35 @@ def casillaBomba():
     if teclaMouse[0] and x >= 0 and x <= 7 and y >= 0 and y <= 7:
         if campo[y][x].bomba:
             campo[y][x].imagen = pygame.transform.scale(pygame.image.load("imgBusca/1.png"),(anchoCelda,altoCelda))
+
+
+#VOY POR AQUI
+array0Bombas = []
+#array0Bombas = [[None for i in range(filas)] for x in range(columnas)]
+def casillaSinBomba():
+    global campo, anchoCelda, altoCelda, mousePos,teclaMouse,array0Bombas,bombita
+    x = int((mousePos[0]/ anchoCelda))
+    y = int((mousePos[1] / altoCelda))
+    if teclaMouse[0] and x >= 0 and x <= 7 and y >= 0 and y <= 7:
+        if not campo[y][x].bomba:
+            for i in range(3):
+                for X in range(3):
+                    if not campo[(y - 1) + i][(x - 1) + X].bomba and campo[((y - 1) + i)][(x - 1) + X] not in array0Bombas:
+                        array0Bombas.append(campo[((y - 1) + i)][(x - 1) + X])
+                    elif campo[(y - 1) + i][(x - 1) + X].bomba:
+                        bombita += 1
+            for bomba0 in array0Bombas:
+                for i in range(3):
+                    for X in range(3):
+                        if((int(bomba0.y / altoCelda) - 1) + i) >= 0 and ((int(bomba0.y / altoCelda) - 1) + i) <= 7 and ((int(bomba0.x / altoCelda) - 1) + i) >= 0 and ((int(bomba0.x / altoCelda) - 1) + i) <= 7: 
+                           
+                            array0Bombas.append(   bomba0[int(bomba0.y / altoCelda) + i][int(bomba0.x / altoCelda) + X]              )
+
+
+
+                    
+
+
 def imgBomba():
     global anchoCelda, altoCelda
     for y in range(8):
@@ -60,7 +92,7 @@ def imgBomba():
 
             
     
-            
+
 
 
 
@@ -80,7 +112,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     casillaBomba()
-
+    casillaSinBomba()
+    print(len(array0Bombas))
     pantalla.fill("white") 
     for i in range(8):
         for x in range(8):
